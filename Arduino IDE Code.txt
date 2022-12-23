@@ -1,0 +1,197 @@
+//--------------Programming ESP8266(wifi module)-------------//
+//--------------------------------------------------------//
+
+
+#include "ThingSpeak.h"
+#include <ESP8266WiFi.h>
+
+//-----------------------wifi details---------------------//
+
+char ssid[]=" "; //ssid
+char pass[]=" "; //password
+
+//------------------channel details-----------------------//
+unsigned long Channel_ID= ;  //Channel ID
+const char "myWriteAPIKey=" "; //write API key
+
+
+const int Field_Number_1= 1;
+const int Field_Number_2= 2;
+const int Field_Number_2= 3;
+String value = "";
+int value_1=0, value_2=0, value_3=0;
+int x,y,z;
+WiFiClient client;
+
+void setup()
+{
+     Serial.begin(115200);
+     WiFi.node(WIFI_SIA);
+      ThingSpeak.begin(client);
+      internet();
+}
+
+
+void loop()
+{
+     internet();
+     if (Serial.available() > 0)
+      {
+          delay(100);
+            while (Serial.available() > 0)
+             {
+                    value = Serial.readString();
+                      if (value[0] == '*'
+                        {
+                           if (value[7] == '#')
+                              {
+                                value_1 = ((value[1] - 0x30)*10 + (value[2] - 0x30));
+                                  value_1 = ((value[3] - 0x30)*10 + (value[4] - 0x30));
+                                    value_1 = ((value[5] - 0x30)*10 + (value[6] - 0x30));
+                                                         }
+                                                }                 
+                                         }
+                                }
+                                   upload();
+      }
+
+void internet()
+{
+    if (WiFi.status() != WL_CONNECTED)
+       {
+          while (WiFi.status() !=WL_CONNECTED)
+            {
+                WiFi.begin(ssid, pass);
+                 delay(5000);
+                   }
+             }
+        }
+void upload()
+{
+     ThingSpeak.writeField
+   (Channel_ID, Field_Number_1, value_1, myWriteAPIKey);
+      delay(15000);
+      ThingSpeak.writeField
+   (Channel_ID, Field_Number_2, value_2, myWriteAPIKey);
+      delay(15000);
+      ThingSpeak.writeField
+   (Channel_ID, Field_Number_3, value_3, myWriteAPIKey);
+      delay(15000);
+      value= " ";
+}
+
+
+
+
+
+//--------------Programming soil moisture sensor-------------//
+//-----------------------------------------------------------//
+
+
+
+
+op_value= analogRead(A0);
+op_value= map(op_value,550,0,0,100);
+   //-------------------------sending data to ESP8266------------------------//
+
+mySerial.print('*'); //Starting char
+mySerial.print(round(DHT.temperature)); //2 digit data
+mySerial.print(round(DHT.humidity)); //2 digit data
+mySerial.print(op_value); //2 digit data
+
+
+
+
+
+//--------------Programming Dht11(Temperature and humidity sensor)-------------//
+//----------------------------------------------------------------------------//
+
+
+mySerial.print('*'); //Starting char
+mySerial.print(round(DHT.temperature)); //2 digit data
+mySerial.print(round(DHT.humidity)); //2 digit data
+
+
+
+
+
+
+//--------------Final setup and Arduino programming-------------//
+//--------------------------------------------------------------//
+
+
+
+#include <math.h>
+#include <dht.h>
+#include <SoftwareSerial.h>
+SoftwareSerial mySerial(10, 11);
+//(Tx,Rx)
+dht DHT;
+#define DHTxxPIN 5
+int op_value;
+
+int ack;
+void setup()
+{
+   Serial.begin(9600);
+    mySerial.begin(115200);
+}
+
+void loop()
+{
+   ack= 0;
+   int chk=DHT.read11(DHTxxPIN);
+   switch(chk)
+{
+     case DHTLIB_ERROR_CONNECT:
+     ack= 1;
+     break;
+}
+   if (ack== 0)
+{
+   Serial.print("Temperature(*C)=");
+   Serial.println(DHT.temperature);
+   Serial.print("Humidity(%)= ");
+   Serial.println(DHT.humidity);
+   op_value=analogRead(A0);
+   op_value=map(op_value,550,0,0,100);
+   Serial.print("Moisture(%): ");
+   Serial.print(op_value);
+   Serial.print("%");
+   Serial.println("\n
+_____________________________\n");
+   
+//___________sending data to ESP8266___________//
+
+mySerial.print('*'); //Starting char 
+mySerial.print(round(DHT.temperature)); //2 digit data
+mySerial.print(round(DHT.humidity));       //2 digit data
+mySerial.print(op_value);  //2 digit data
+mySerial.println('#'); //Ending char
+//________________________________________________________//
+
+delay(2000);
+}
+
+if (ack==1)
+{
+   Serial.print("NO DATA");
+   Serial.print("\n\n");
+   delay(2000);
+    
+     }
+}      
+
+
+
+
+
+
+
+
+
+
+
+
+
+
